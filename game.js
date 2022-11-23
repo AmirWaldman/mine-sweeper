@@ -1,11 +1,11 @@
-/*  display/ui
+'use strict'
 
-1. Populate a board with mines
-    2. leftClick on cells
-        reveal cells
-    3. RightClick on cells
-        mark cells
-        4.  win/lose check */
+// 1. Populate a board with mines
+//     2. leftClick on cells
+//         reveal cells
+//     3. RightClick on cells
+//         mark cells
+//         4.  win/lose check */
 // {
 
 // gLevel = {
@@ -13,19 +13,19 @@
 //     MINES: 2
 // };
 
-// gGame = {
-//     isOn: false,
-//     shownCount: 0,
-//     markedCount: 0,
-//     secsPassed: 0
-// }
+var gBoard
+var gGame
 function onInit() {
-    const gBoard = createBoard(2)
-    gBoard[0][0].isMine = true
-    gBoard[1][1].isMine = true
-    boardMinsAroundUpdate(gBoard)
+    gGame = {
+        isOn: false,
+        shownCount: 0,
+        markedCount: 0,
+        secsPassed: 0
+    }
+    gBoard = createBoard(5)
+    // 
     console.log (gBoard)
-    renderBoard(gBoard, '.board-container')
+    renderBoard(gBoard)
 }
 
 function createBoard(length) {
@@ -36,19 +36,18 @@ function createBoard(length) {
 
         for (var j = 0; j < length; j++) {
             board[i][j] = {
-                minesAroundCount: 4,
-                isShown: true,
+                minesAroundCount: 3,
+                isShown: false,
                 isMine: false,
-                isMarked: true
+                isMarked: false
             }
         }
     }
-    gBoardLength = i
     return board
 }
 
 
-function renderBoard(mat, selector) {
+function renderBoard(mat) {
 
     var strHTML = '<table border="1"><tbody>'
     for (var i = 0; i < mat.length; i++) {
@@ -58,23 +57,23 @@ function renderBoard(mat, selector) {
             const cell = mat[i][j]
             // cell = 
             // console.log(cell)
-            const className = `cell cell-${i}-${j}`
+            const className = `cell cell-${i}-${j} `
 
             strHTML += `<td class="${className} `
-            if (cell.isMine) strHTML += `mine `
-            if (!cell.isShown) strHTML += `notShown `
-            if (cell.isMarked) strHTML += `marked">`
-            strHTML += `${cell.minesAroundCount}</td>`
+            if (cell.isShown) strHTML += `shown `
+            if (cell.isMarked) strHTML += `marked`
+            var minesAroundCount = ((cell.minesAroundCount>0)&&(cell.isShown)) ? cell.minesAroundCount : ''
+            strHTML += `" onclick="onCellClicked(${i},${j})"> ${minesAroundCount}</td>`
         }
         strHTML += '</tr>'
     }
     strHTML += '</tbody></table>'
 
-    const elContainer = document.querySelector(selector)
+    const elContainer = document.querySelector('.board-container')
     elContainer.innerHTML = strHTML
 }
 
-function boardMinsAroundUpdate(mat) {
+function boardMinesAroundUpdate(mat) {
     for (var i = 0; i < mat.length; i++) {
         for (var j = 0; j < mat.length; j++) {
             
@@ -85,20 +84,52 @@ function boardMinsAroundUpdate(mat) {
 
 function setMinesNegsCount(cellI, cellJ,mat) {
     var neighborsCount = 0
-    if (mat[cellI][cellJ].isMine) return null
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= mat.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (j < 0 || j >= mat[i].length) continue
+            if ((cellI === i) && (cellJ === j)) continue
             if (mat[i][j].isMine) neighborsCount++
         }
 
     }
     return neighborsCount
 }
+
+function onCellClicked(cellI, cellJ) {
+    gGame.shownCount++
+    if (gGame.shownCount === 1){
+        gGame.isOn=true
+        setRandomMines(2,cellI,cellJ)
+        boardMinesAroundUpdate(gBoard)
+        console.log(gBoard)
+    }
+    gBoard[cellI][cellJ].isShown = true
+    renderBoard(gBoard)
+}
+
+function setRandomMines(amount,posI,posJ){
+    while (amount>0){
+        console.log(gBoard.length)
+        var i = getRandomIntInt(0,gBoard.length)
+        var j = getRandomIntInt(0,gBoard.length)
+        if ((i === posI) && (j === posJ)) continue
+        amount--
+        gBoard[i][j].isMine = !(gBoard[i][j].isMine)
+    }
+
+}
+
+
 // Create setMinesNegsCount() and store the numbers
 // (isShown is still true)
 // 2. Present the board with the neighbor count and the mines
 // using renderBoard() function.
 // 3. Have a console.log presenting the board content – to help
 // you with debugging
+
+function getRandomIntInt(min, max) {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
