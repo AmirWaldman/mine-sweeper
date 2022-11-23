@@ -23,9 +23,9 @@ function onInit() {
     const gBoard = createBoard(2)
     gBoard[0][0].isMine = true
     gBoard[1][1].isMine = true
-    var mindaround = boardMindAroundUpdate(gBoard)
-console.log (mindaround)
-    // renderBoard(gBoard, '.board-container')
+    boardMinsAroundUpdate(gBoard)
+    console.log (gBoard)
+    renderBoard(gBoard, '.board-container')
 }
 
 function createBoard(length) {
@@ -74,10 +74,11 @@ function renderBoard(mat, selector) {
     elContainer.innerHTML = strHTML
 }
 
-function boardMindAroundUpdate(mat) {
+function boardMinsAroundUpdate(mat) {
     for (var i = 0; i < mat.length; i++) {
         for (var j = 0; j < mat.length; j++) {
-            mat[i][j] = setMinesNegsCount(i,j,mat)
+            
+            mat[i][j].minesAroundCount = setMinesNegsCount(i,j,mat)
         }
     }
 }
