@@ -8,3 +8,9 @@
 .shown{
     background-color: blue;
 }
+.mine{
+  background-color: black;
+}
+.marked {
+  background-color: yellowgreen;
+}

@@ -1,171 +1,115 @@
-'use strict'
-  
+function onInit() {
+
+    gBoard = createBoard(gLevel.SIZE)
+    // console.log(gBoard)
+    renderBoard(gBoard)
+}
 
 
-
-function createBoard(boardLength, minesNum) {
+// creates the board when called:
+function createBoard(length) {
     var board = []
 
-    for (var i = 0; i < boardLength; i++) {
-      board.push([])
+    for (var i = 0; i < length; i++) {
+        board.push([])
 
-      for (var j = 0; j < 8; j++) {
-        board[i][j] = (Math.random() > 0.5) ? LIFE : ''
-      }
-    }
-
-    return board
-}
-
-
-function renderBoard(board) {
-    var strHTML = ''
-
-    for (var i = 0; i < board.length; i++) {
-      strHTML += '<tr>'
-
-      for (var j = 0; j < board[0].length; j++) {
-        var cell = board[i][j]
-        var className = (cell) ? 'occupied' : ''
-        var cellData = 'data-i="' + i + '" data-j="' + j + '"'
-  
-        strHTML += `<td class="${className}" ${cellData}
-            onclick="onCellClicked(this,${i},${j})"></td>`
-      }
-
-      strHTML += '</tr>\n'
-    }
-
-    var elBoard = document.querySelector('.board')
-    elBoard.innerHTML = strHTML
-}
-
-
-function copyMat(mat) {
-    var newMat = []
-
-    for (var i = 0; i < mat.length; i++) {
-      newMat[i] = []
-
-      for (var j = 0; j < mat[0].length; j++) {
-        newMat[i][j] = mat[i][j]
-      }
-    }
-
-    return newMat
-}
-
-
-// Returns the class name for a specific cell
-function getClassName(location) {
-    const cellClass = 'cell-' + location.i + '-' + location.j
-    return cellClass
-}
-
-
-// Convert a location object {i, j} to a selector and render a value in that element
-function renderCell(location, value) {
-    const cellSelector = '.' + getClassName(location) // cell-i-j
-    const elCell = document.querySelector(cellSelector)
-    elCell.innerHTML = value
-}
-
-
-function getEmptyCells(){
-	var emptyCells = []
-
-    for (var i = 0; i < gBoard.length; i++) {
-
-        for (var j = 0; j < gBoard[i].length; j++) {
-			
-            if((gBoard[i][j] != WALL) && (gBoard[i][j] != PACMAN) && (gBoard[i][j] != POWER_FOOD)){
-                emptyCells.push({ i, j })
+        for (var j = 0; j < length; j++) {
+            board[i][j] = {
+                minesAroundCount: 0,
+                isShown: false,
+                isMine: false,
+                isMarked: false
             }
         }
     }
-
-    return emptyCells
-} 
-
-
-function getNextLocation(eventKeyboard) {
-    // console.log(eventKeyboard)
-    const nextLocation = {
-        i: gPacman.location.i,
-        j: gPacman.location.j
-    }
-    // DONE: figure out nextLocation
-    switch (eventKeyboard) {
-        case 'ArrowUp':
-            nextLocation.i--
-            break;
-        case 'ArrowRight':
-            nextLocation.j++
-            break;
-        case 'ArrowDown':
-            nextLocation.i++
-            break;
-        case 'ArrowLeft':
-            nextLocation.j--
-            break;
-    }
-
-    return nextLocation
+    return board
 }
 
+// rendering the board:
+function renderBoard() {
+    // creating the string that will go to the DOM to build the board
+    var strHTML = '<table border="1"><tbody>'
+    for (var i = 0; i < gBoard.length; i++) {
 
-function drawNum(nums){
-    var idx = getRandomInt(0, nums.length)
-    var num = nums[idx]
-    nums.splice(idx, 1)
+        strHTML += '<tr>'
+        for (var j = 0; j < gBoard[0].length; j++) {
+            const cell = gBoard[i][j]
+            // cell = 
+            // console.log(cell)
+            const className = `cell cell-${i}-${j} `
 
-    return num
+            strHTML += `<td class="${className} `
+            if (cell.isShown) strHTML += `shown `
+            if (cell.isMarked) strHTML += `marked`
+            var minesAroundCount = ((cell.minesAroundCount > 0) && (cell.isShown)) ? cell.minesAroundCount : ''
+            strHTML += `"onmousedown="onCellClicked(${i},${j},event)"> ${minesAroundCount}</td>`
+        }
+        strHTML += '</tr>'
+    }
+    strHTML += '</tbody></table>'
+
+    const elContainer = document.querySelector('.board-container')
+    elContainer.innerHTML = strHTML
+    // shutting down the default menu poping on rightclick:
+    elContainer.addEventListener('contextmenu', (e) => {
+        e.preventDefault()
+    })
 }
 
-
+// gets a random num:
 function getRandomIntInt(min, max) {
     min = Math.ceil(min)
     max = Math.floor(max)
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-
-function shuffle(items) {
-    var randIdx, keep, i;
-    for (i = items.length - 1; i > 0; i--) {
-      randIdx = getRandomInt(0, items.length - 1)
-  
-      keep = items[i];
-      items[i] = items[randIdx]
-      items[randIdx] = keep
+// timer for the game:
+function timer() {
+    // var currTime = gTime
+    // <div>timer: <span class="min">00</span>:<span class="sec">00</span></div>
+    var elMin = document.querySelector('.min')
+    var elSec = document.querySelector('.sec')
+    var currSec = elSec.innerHTML
+    var currMin = elMin.innerHTML
+    currSec++
+    if (currSec > 59) {
+        currMin++
+        currSec = 0
     }
+    elSec.innerHTML = (currSec < 10) ? '0' + currSec : currSec
+    elMin.innerHTML = (currMin < 10 && (!currSec)) ? '0' + currMin : currMin
 
-    return items
+    var currMin = elMin.innerHTML
+    var currSec = elSec.innerHTML
 }
 
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'
-    var color = '#'
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)]
+// reavels all cells in the game:
+function showAllCells() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[i].length; j++) {
+            gBoard[i][j].isShown = true
+        }
     }
-
-    return color
 }
 
+//shows from 1 point index to another 1:
+function fromToShow(iMin, iMax, jMin, jMax) {
+    for (var i = iMin; i <= iMax; i++) {
+        for (var j = jMin; j <= jMax; j++) {
+            gBoard[i][j].isShown = true
+        }
+    }
+}
 
-function timer(){
-    var timer = document.querySelector('.timer span')
-    var start = Date.now()
+// Cell without neighbors – expand it and its 1st degree neighbors
+function noNeighborShow(cellI, cellJ) {
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= gBoard.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= gBoard[i].length) continue
+            if ((cellI === i) && (cellJ === j)) continue
+            gBoard[i][j].isShown = true
+        }
 
-    gTimerInterval = setInterval(function () {
-      var currTs = Date.now()
-      var secs = parseInt((currTs - start) / 1000)
-      var ms = (currTs - start) - secs * 1000
-      ms = '000' + ms
-      ms = ms.substring(ms.length - 2, ms.length)
-  
-      timer.innerText = `\n ${secs}:${ms}`
-    }, 100)
+    }
 }
