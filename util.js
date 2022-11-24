@@ -1,8 +1,13 @@
-function onInit() {
 
+// runs with index.html start
+function onInit() {
+    gGame.isOn = true
     gBoard = createBoard(gLevel.SIZE)
     // console.log(gBoard)
     renderBoard(gBoard)
+    gGame.shownCount = 0
+    document.querySelector('.msg').innerHTML = `MiNe SwEePeR`
+    resetTimer()
 }
 
 
@@ -15,7 +20,7 @@ function createBoard(length) {
 
         for (var j = 0; j < length; j++) {
             board[i][j] = {
-                minesAroundCount: 0,
+                minesAroundCount: '0',
                 isShown: false,
                 isMine: false,
                 isMarked: false
@@ -37,11 +42,15 @@ function renderBoard() {
             // cell = 
             // console.log(cell)
             const className = `cell cell-${i}-${j} `
-
+            var minesAroundCount = ''
             strHTML += `<td class="${className} `
-            if (cell.isShown) strHTML += `shown `
-            if (cell.isMarked) strHTML += `marked`
-            var minesAroundCount = ((cell.minesAroundCount > 0) && (cell.isShown)) ? cell.minesAroundCount : ''
+            minesAroundCount = cell.minesAroundCount
+            if (!cell.isShown) {
+                minesAroundCount = ''
+            } else strHTML += `shown `
+            if (cell.minesAroundCount === '0') minesAroundCount = ''
+            if (cell.isMarked && (gGame.isOn)) { strHTML += `marked`
+            minesAroundCount ='🚩' }
             strHTML += `"onmousedown="onCellClicked(${i},${j},event)"> ${minesAroundCount}</td>`
         }
         strHTML += '</tr>'
@@ -81,6 +90,13 @@ function timer() {
 
     var currMin = elMin.innerHTML
     var currSec = elSec.innerHTML
+}
+// resets the timer:
+function resetTimer(){
+    var elMin = document.querySelector('.min')
+    var elSec = document.querySelector('.sec')
+    elMin.innerText = '00'
+    elSec.innerText = '00'
 }
 
 // reavels all cells in the game:

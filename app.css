@@ -1,16 +1,37 @@
+body {
+  text-align: center;
+  background: linear-gradient(to top, lightgray, lightblue)
+}
 .cell {
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 0.75em;
   }
 
 .shown{
-    background-color: blue;
+    background-color: gray;
 }
 .mine{
   background-color: black;
 }
 .marked {
-  background-color: yellowgreen;
+  background: linear-gradient(to top, gray, white);
 }
+button {
+width: 100px;
+height: 45px;
+}
+
+.board-container {
+margin-top: 30px;
+display: flex;
+justify-content: center;
+align-items: center;
+text-align: center;
+}
+
+table{
+  border-spacing: 3px;
+}
+

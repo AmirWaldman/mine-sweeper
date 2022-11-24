@@ -13,13 +13,43 @@ var gGame = {
 var gBoard
 var gIsTimerOn = true
 var gInterval
+// choose the level of play:
+function chooseLevel(elBtn) {
+    var currLevel = elBtn.innerHTML
+    // console.log(currLevel);
 
+    if (currLevel === 'Eazy😄 4X4 (2💣)') {
+        gLevel.SIZE = 4
+        gLevel.MINES = 2
+        onInit()
+
+    }
+    else if (currLevel === 'Medium😅 8X8(14💣)') {
+        gLevel.SIZE = 8
+        gLevel.MINES = 14
+        onInit()
+
+    }
+    else if (currLevel === 'Expert🤓 12X12(32💣)') {
+        gLevel.SIZE = 12
+        gLevel.MINES = 32
+        onInit()
+
+    }
+    else if (currLevel === 'Reset') {
+        onInit()
+
+    }
+
+
+    // var elCurrDiff = document.querySelector()
+}
 
 // updating each cell how many mines around it
 function boardMinesAroundUpdate() {
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
-            gBoard[i][j].minesAroundCount = gBoard[i][j].isMine ? 9 : setMinesNegsCount(i, j, gBoard)
+            gBoard[i][j].minesAroundCount = gBoard[i][j].isMine ? '💣' : ''+setMinesNegsCount(i, j, gBoard)
         }
     }
 }
@@ -56,7 +86,8 @@ function gameOver() {
     clearInterval(gInterval)
     var msg = (checkWin()) ? 'congrats!' : 'GameOver'
     showAllCells()
-    document.querySelector('.msg').innerHTML = `${msg}`
+    if (gGame.isOn) document.querySelector('.msg').innerHTML = `${msg}`
+    gGame.isOn = false
 }
 
 // checks if the player won
@@ -69,7 +100,6 @@ function checkWin() {
             if (!isItClean) return false
         }
     }
-    return (isItClean)
 }
 
 // describes what happening when a cell is clicked by the user:
@@ -88,7 +118,7 @@ function onCellClicked(cellI, cellJ, event) {
     if (!event.button) {
         gBoard[cellI][cellJ].isShown = true
         if (gBoard[cellI][cellJ].isMine) gameOver()
-        else if (gBoard[cellI][cellJ].minesAroundCount === 0) noNeighborShow(cellI, cellJ)
+        else if (gBoard[cellI][cellJ].minesAroundCount === '0') noNeighborShow(cellI, cellJ)
     }
     else if (event.button === 2) {
         gBoard[cellI][cellJ].isMarked = !gBoard[cellI][cellJ].isMarked
