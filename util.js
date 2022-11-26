@@ -1,5 +1,6 @@
+'use strict'
 
-// runs with index.html start
+// runs with index.html sta'rt
 function onInit() {
     gGame.isOn = true
     gGame.lives = 3

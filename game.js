@@ -94,15 +94,13 @@ function gameOver() {
 
 // checks if the player won
 function checkWin() {
-    var isItClean = true
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
-            if ((!(gBoard[i][j].isShown)) && (!(gBoard[i][j].isMarked))) isItClean = false
-            else if (gBoard[i][j].isMarked && !(gBoard[i][j].isMine)) isItClean = false
-            if (!isItClean) return false
+            if (gBoard[i][j].isMine && ((!gBoard[i][j].isMarked) && (!gBoard[i][j].isShown))) return false
+            else if ((!gBoard[i][j].isMine) && (gBoard[i][j].isMarked))return false
         }
     }
-    return isItClean
+    return true
 }
 
 // describes what happening when a cell is clicked by the user:
@@ -123,15 +121,14 @@ function onCellClicked(cellI, cellJ, event) {
         if (gBoard[cellI][cellJ].isMine) {
             gGame.lives--
             if (!gGame.lives) gameOver()
-            
+
         } else if (gBoard[cellI][cellJ].minesAroundCount === '0') noNeighborShow(cellI, cellJ)
 
     } else if (event.button === 2) {
         gBoard[cellI][cellJ].isMarked = !gBoard[cellI][cellJ].isMarked
-        gGame.markedCount++
+        gGame.markedCount = (gBoard[cellI][cellJ].isMarked) ? gGame.markedCount - 1 : gGame.markedCount + 1
     }
-    if (checkWin() === true) gameOver()
+    if (checkWin()) gameOver()
     // updating the board:
     renderBoard(gBoard)
 }
-

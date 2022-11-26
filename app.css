@@ -3,10 +3,10 @@ body {
   background: linear-gradient(to top, lightgray, lightblue)
 }
 .cell {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     text-align: center;
-    font-size: 0.75em;
+    font-size: 1.1em;
   }
 
 .shown{
