@@ -2,6 +2,7 @@
 // runs with index.html start
 function onInit() {
     gGame.isOn = true
+    gGame.lives = 3
     gBoard = createBoard(gLevel.SIZE)
     // console.log(gBoard)
     renderBoard(gBoard)
@@ -49,8 +50,10 @@ function renderBoard() {
                 minesAroundCount = ''
             } else strHTML += `shown `
             if (cell.minesAroundCount === '0') minesAroundCount = ''
-            if (cell.isMarked && (gGame.isOn)) { strHTML += `marked`
-            minesAroundCount ='🚩' }
+            if (cell.isMarked && (gGame.isOn)) {
+                strHTML += `marked`
+                minesAroundCount = '🚩'
+            }
             strHTML += `"onmousedown="onCellClicked(${i},${j},event)"> ${minesAroundCount}</td>`
         }
         strHTML += '</tr>'
@@ -63,6 +66,9 @@ function renderBoard() {
     elContainer.addEventListener('contextmenu', (e) => {
         e.preventDefault()
     })
+    // updating how many lives left:
+    document.querySelector('.lives').innerText = `${gGame.lives}`
+
 }
 
 // gets a random num:
@@ -92,7 +98,7 @@ function timer() {
     var currSec = elSec.innerHTML
 }
 // resets the timer:
-function resetTimer(){
+function resetTimer() {
     var elMin = document.querySelector('.min')
     var elSec = document.querySelector('.sec')
     elMin.innerText = '00'
@@ -108,24 +114,20 @@ function showAllCells() {
     }
 }
 
-//shows from 1 point index to another 1:
-function fromToShow(iMin, iMax, jMin, jMax) {
-    for (var i = iMin; i <= iMax; i++) {
-        for (var j = jMin; j <= jMax; j++) {
-            gBoard[i][j].isShown = true
-        }
-    }
-}
+
 
 // Cell without neighbors – expand it and its 1st degree neighbors
 function noNeighborShow(cellI, cellJ) {
+
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (j < 0 || j >= gBoard[i].length) continue
             if ((cellI === i) && (cellJ === j)) continue
+            if (gBoard[i, j].minesAroundCount === '0') noNeighborShow(i, j)
             gBoard[i][j].isShown = true
         }
 
     }
+    renderBoard()
 }

@@ -10,7 +10,7 @@ body {
   }
 
 .shown{
-    background-color: gray;
+  background: linear-gradient(to top, lightblue,lightgreen);
 }
 .mine{
   background-color: black;
@@ -24,7 +24,7 @@ height: 45px;
 }
 
 .board-container {
-margin-top: 30px;
+margin-block: 30px;
 display: flex;
 justify-content: center;
 align-items: center;
@@ -35,3 +35,14 @@ table{
   border-spacing: 3px;
 }
 
+.footer {
+  position: static;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to top, green, white, darkred);
+  bottom: 0; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}

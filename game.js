@@ -8,11 +8,13 @@ var gGame = {
     isOn: false,
     shownCount: 0,
     markedCount: 0,
-    secsPassed: 0
+    secsPassed: 0,
+    lives: 3
 }
 var gBoard
 var gIsTimerOn = true
 var gInterval
+
 // choose the level of play:
 function chooseLevel(elBtn) {
     var currLevel = elBtn.innerHTML
@@ -49,7 +51,7 @@ function chooseLevel(elBtn) {
 function boardMinesAroundUpdate() {
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[i].length; j++) {
-            gBoard[i][j].minesAroundCount = gBoard[i][j].isMine ? '💣' : ''+setMinesNegsCount(i, j, gBoard)
+            gBoard[i][j].minesAroundCount = gBoard[i][j].isMine ? '💣' : '' + setMinesNegsCount(i, j, gBoard)
         }
     }
 }
@@ -100,12 +102,13 @@ function checkWin() {
             if (!isItClean) return false
         }
     }
+    return isItClean
 }
 
 // describes what happening when a cell is clicked by the user:
 function onCellClicked(cellI, cellJ, event) {
     gGame.shownCount++
-    
+
     if (gGame.shownCount === 1) {
         //first click starts sets the game!
         gInterval = setInterval(timer, 1000)
@@ -117,14 +120,17 @@ function onCellClicked(cellI, cellJ, event) {
     // game cond. - when a cell is clicked:
     if (!event.button) {
         gBoard[cellI][cellJ].isShown = true
-        if (gBoard[cellI][cellJ].isMine) gameOver()
-        else if (gBoard[cellI][cellJ].minesAroundCount === '0') noNeighborShow(cellI, cellJ)
-    }
-    else if (event.button === 2) {
+        if (gBoard[cellI][cellJ].isMine) {
+            gGame.lives--
+            if (!gGame.lives) gameOver()
+            
+        } else if (gBoard[cellI][cellJ].minesAroundCount === '0') noNeighborShow(cellI, cellJ)
+
+    } else if (event.button === 2) {
         gBoard[cellI][cellJ].isMarked = !gBoard[cellI][cellJ].isMarked
-        gGame.markedCount ++
-        if (checkWin()===true) gameOver()
+        gGame.markedCount++
     }
+    if (checkWin() === true) gameOver()
     // updating the board:
     renderBoard(gBoard)
 }
